@@ -11,12 +11,22 @@ class HotelController extends Controller
 {
     public function index()
     {
-        try {
-            $hoteles = Hotel::get();
-            return response()->json($hoteles);
-        } catch (ModelNotFoundException $e) {
-            return response()->json(['message' => 'Hotel not found'], 404);
-        }
+        $hoteles = Hotel::with('destino')
+        ->select('id', 'name', 'destino_id', 'slug', 'images', 'active')
+            ->get()
+            ->map(function ($hotel) {
+                return [
+                    'id' => $hotel->id,
+                    'name' => $hotel->name,
+                    'destino_id' => $hotel->destino_id,
+                    'destino' => $hotel->destino?->name,
+                    'slug' => $hotel->slug,
+                    'images' => $hotel->images,
+                    'active' => $hotel->active,
+                ];
+            });
+
+        return response()->json($hoteles);
     }
 
     public function store(Request $request)

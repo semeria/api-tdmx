@@ -15,7 +15,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::apiResource('destinos', DestinoController::class);
-Route::apiResource('hotel', HotelController::class)->middleware(['auth:sanctum', 'ability']);
+Route::apiResource('hotel', HotelController::class);
 Route::get('/hotel/slug/{slug}', [HotelController::class, 'getHotelBySlug'])->middleware(['auth:sanctum', 'ability']);
 Route::apiResource('tour', TourController::class);
 Route::get('/tour/slug/{slug}', [TourController::class, 'getTourBySlug']);

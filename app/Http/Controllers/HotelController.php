@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Hotel;
+use App\Models\ServiciosSubcategoria;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
@@ -46,30 +47,39 @@ class HotelController extends Controller
     public function show(string $id)
     {
         try {
-            // 1. Cargamos el hotel junto con el destino y los servicios
-            $hotel = Hotel::with(['destino'])->findOrFail($id);
+            // 1. Cargamos el hotel y su destino
+            $hotel = Hotel::with('destino')->findOrFail($id);
 
-            // 2. Formateamos la respuesta manualmente (igual que en tu map del index)
+            $servicesData = collect($hotel->services);
+
+            $categoryIds = $servicesData->pluck('categoria_id')->unique()->filter();
+
+            $amenitiesList = ServiciosSubcategoria::whereIn('id', $categoryIds)
+                ->pluck('name')
+                ->values()
+                ->toArray();
+
+            // 3. Construimos la respuesta final
             $data = [
                 'id' => $hotel->id,
                 'name' => $hotel->name,
                 'slug' => $hotel->slug,
-
-                // Relación de Destino (Aplanada)
                 'destino_id' => $hotel->destino_id,
-                'destino' => $hotel->destino?->name, // Usamos ?-> por si el destino viniera null
+                'destino' => $hotel->destino?->name,
 
-                // Datos específicos del detalle (que no estaban en el index)
                 'address' => $hotel->address,
                 'description' => $hotel->description,
                 'price' => $hotel->price,
                 'reviews' => $hotel->reviews,
                 'google_maps' => $hotel->google_maps,
                 'images' => $hotel->images,
-
-                // Relación de Servicios
-                // Mapeamos para limpiar el objeto o devolver solo lo necesario
                 'services' => $hotel->services,
+
+                // Aquí está tu array simple de nombres
+                'amenities' => $amenitiesList,
+
+                // (Opcional) Si ya no quieres devolver el JSON crudo de 'services', puedes quitar esta línea:
+                // 'services' => $hotel->services,
 
                 'active' => $hotel->active,
             ];

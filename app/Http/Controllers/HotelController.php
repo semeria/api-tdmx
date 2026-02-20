@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Hotel;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class HotelController extends Controller
 {
@@ -47,8 +46,42 @@ class HotelController extends Controller
     public function show(string $id)
     {
         try {
-            $hotel = Hotel::findOrFail($id);
-            return response()->json($hotel);
+            // 1. Cargamos el hotel junto con el destino y los servicios
+            $hotel = Hotel::with(['destino', 'services'])->findOrFail($id);
+
+            // 2. Formateamos la respuesta manualmente (igual que en tu map del index)
+            $data = [
+                'id' => $hotel->id,
+                'name' => $hotel->name,
+                'slug' => $hotel->slug,
+
+                // Relación de Destino (Aplanada)
+                'destino_id' => $hotel->destino_id,
+                'destino' => $hotel->destino?->name, // Usamos ?-> por si el destino viniera null
+
+                // Datos específicos del detalle (que no estaban en el index)
+                'address' => $hotel->address,
+                'description' => $hotel->description,
+                'price' => $hotel->price,
+                'reviews' => $hotel->reviews,
+                'google_maps' => $hotel->google_maps,
+                'images' => $hotel->images,
+
+                // Relación de Servicios
+                // Mapeamos para limpiar el objeto o devolver solo lo necesario
+                'services' => $hotel->services->map(function($service) {
+                    return [
+                        'id' => $service->id,
+                        'categoria_id' => $service->categoria_id,
+                        // Si tu modelo Service tiene nombre, deberías agregarlo aquí:
+                        // 'name' => $service->name,
+                    ];
+                }),
+
+                'active' => $hotel->active,
+            ];
+
+            return response()->json($data);
 
         } catch (ModelNotFoundException $e) {
             return response()->json([

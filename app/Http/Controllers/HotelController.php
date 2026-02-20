@@ -50,16 +50,21 @@ class HotelController extends Controller
             // 1. Cargamos el hotel y su destino
             $hotel = Hotel::with('destino')->findOrFail($id);
 
-            $servicesData = collect($hotel->services);
+            // 2. Procesamos el JSON de servicios
+            $servicesCollection = collect($hotel->services);
 
-            $categoryIds = $servicesData->pluck('categoria_id')->unique()->filter();
+            // A. Extraemos los IDs de las SUBCATEGORÍAS (el campo 'id' del JSON)
+            // Esto nos dará algo como: [2, 1, 4, 6, 3]
+            $subcategoriaIds = $servicesCollection->pluck('id')->filter();
 
-            $amenitiesList = ServiciosSubcategoria::whereIn('id', $categoryIds)
-                ->pluck('name')
-                ->values()
+            // B. Buscamos los nombres de esas subcategorías en la base de datos
+            // Usamos whereIn con los IDs que acabamos de sacar
+            $amenitiesList = ServiciosSubcategoria::whereIn('id', $subcategoriaIds)
+                ->pluck('name') // Solo queremos el nombre
+                ->values()      // Reindexamos para tener un array limpio
                 ->toArray();
 
-            // 3. Construimos la respuesta final
+            // 3. Construimos la respuesta
             $data = [
                 'id' => $hotel->id,
                 'name' => $hotel->name,
@@ -75,11 +80,10 @@ class HotelController extends Controller
                 'images' => $hotel->images,
                 'services' => $hotel->services,
 
-                // Aquí está tu array simple de nombres
+                // AQUÍ ESTÁ EL CAMBIO:
+                // Devuelve un array simple de strings con los nombres de las subcategorías
+                // Ejemplo: ["Wifi", "Toallas de playa", "Bar en la piscina"]
                 'amenities' => $amenitiesList,
-
-                // (Opcional) Si ya no quieres devolver el JSON crudo de 'services', puedes quitar esta línea:
-                // 'services' => $hotel->services,
 
                 'active' => $hotel->active,
             ];

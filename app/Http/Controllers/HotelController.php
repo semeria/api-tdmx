@@ -47,7 +47,7 @@ class HotelController extends Controller
     {
         try {
             // 1. Cargamos el hotel junto con el destino y los servicios
-            $hotel = Hotel::with(['destino', 'services'])->findOrFail($id);
+            $hotel = Hotel::with(['destino'])->findOrFail($id);
 
             // 2. Formateamos la respuesta manualmente (igual que en tu map del index)
             $data = [
@@ -69,14 +69,7 @@ class HotelController extends Controller
 
                 // Relación de Servicios
                 // Mapeamos para limpiar el objeto o devolver solo lo necesario
-                'services' => $hotel->services->map(function($service) {
-                    return [
-                        'id' => $service->id,
-                        'categoria_id' => $service->categoria_id,
-                        // Si tu modelo Service tiene nombre, deberías agregarlo aquí:
-                        // 'name' => $service->name,
-                    ];
-                }),
+                'services' => $hotel->services,
 
                 'active' => $hotel->active,
             ];

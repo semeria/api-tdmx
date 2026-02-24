@@ -23,6 +23,7 @@ class HotelController extends Controller
                     'slug' => $hotel->slug,
                     'images' => $hotel->images,
                     'active' => $hotel->active,
+                    'principal' => $hotel->principal_image_url, //Aqui va cargar la imagen principal
                 ];
             });
 
@@ -49,21 +50,6 @@ class HotelController extends Controller
         try {
             // 1. Cargamos el hotel y su destino
             $hotel = Hotel::with('destino')->findOrFail($id);
-
-            // 2. Procesamos el JSON de servicios
-            $servicesCollection = collect($hotel->services);
-
-            // A. Extraemos los IDs de las SUBCATEGORÍAS (el campo 'id' del JSON)
-            // Esto nos dará algo como: [2, 1, 4, 6, 3]
-            $subcategoriaIds = $servicesCollection->pluck('id')->filter();
-
-            // B. Buscamos los nombres de esas subcategorías en la base de datos
-            // Usamos whereIn con los IDs que acabamos de sacar
-            $amenitiesList = ServiciosSubcategoria::whereIn('id', $subcategoriaIds)
-                ->pluck('name') // Solo queremos el nombre
-                ->values()      // Reindexamos para tener un array limpio
-                ->toArray();
-
             // 3. Construimos la respuesta
             $data = [
                 'id' => $hotel->id,
@@ -79,11 +65,7 @@ class HotelController extends Controller
                 'google_maps' => $hotel->google_maps,
                 'images' => $hotel->images,
                 'services' => $hotel->services,
-
-                // AQUÍ ESTÁ EL CAMBIO:
-                // Devuelve un array simple de strings con los nombres de las subcategorías
-                // Ejemplo: ["Wifi", "Toallas de playa", "Bar en la piscina"]
-                'amenities' => $amenitiesList,
+                'amenities' => $hotel->amenities_list,
 
                 'active' => $hotel->active,
             ];

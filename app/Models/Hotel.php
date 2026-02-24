@@ -69,31 +69,15 @@ class Hotel extends Model
     {
         return Attribute::make(
             get: function () {
-                // 1. Verificamos si existe el campo images y no es nulo
                 if (empty($this->images)) {
-                    return null; // O una URL de imagen por defecto ('/img/placeholder.jpg')
+                    return null;
                 }
-
-                // 2. Intentamos acceder a la estructura images['principal']
-                // Como 'images' ya es un array (gracias al cast), accedemos directamente.
-                // Asumimos que 'principal' es un array y queremos el primer elemento o su campo 'url'
-
                 $images = $this->images;
 
-                // Opción A: Si 'principal' es un solo objeto con campo 'url'
-                // return $images['principal']['url'] ?? null;
-
-                // Opción B: Si 'principal' es un array de objetos (ej. [{url: '...'}, {url: '...'}])
-                // y quieres la primera imagen de ese grupo:
                 if (isset($images['principal']) && is_array($images['principal']) && count($images['principal']) > 0) {
-                    // Ajusta esto según si tu estructura es ['url' => '...'] o [{'url' => '...'}]
-                    // Si es un array de objetos:
+
                     return $images['principal'][0]['url'] ?? null;
-
-                    // Si 'principal' ya es el objeto directo:
-                    // return $images['principal']['url'] ?? null;
                 }
-
                 return null;
             }
         );

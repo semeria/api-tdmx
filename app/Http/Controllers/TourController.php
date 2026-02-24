@@ -13,7 +13,21 @@ class TourController extends Controller
      */
     public function index()
     {
-        $tours = Tour::get();
+        $tours = Tour::with('destino')
+            ->select('id', 'name', 'destino_id', 'slug', 'images', 'active')
+            ->get()
+            ->map(function ($tour) {
+                return [
+                    'id' => $tour->id,
+                    'name' => $tour->name,
+                    'destino_id' => $tour->destino_id,
+                    'destino' => $tour->destino?->name,
+                    'slug' => $tour->slug,
+                    'images' => $tour->images,
+                    'active' => $tour->active,
+                    'principal' => $tour->principal_image_url, //Aqui va cargar la imagen principal
+                ];
+            });
         return response()->json($tours);
 
     }

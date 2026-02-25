@@ -82,4 +82,24 @@ class Hotel extends Model
             }
         );
     }
+
+    protected function gallery(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $images = $this->images;
+
+                if (empty($images) || !is_array($images)) {
+                    return [];
+                }
+
+                return collect($images)
+                    ->flatten(1)     // Combina los arrays de principal, secundaria y adicional
+                    ->pluck('url')   // Saca solo la URL
+                    ->filter()       // Quita nulos
+                    ->values()       // Reindexa [0, 1, 2...]
+                    ->toArray();     // Convierte a array nativo de PHP
+            }
+        );
+    }
 }

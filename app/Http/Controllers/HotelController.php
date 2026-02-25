@@ -66,6 +66,7 @@ class HotelController extends Controller
                 'images' => $hotel->images,
                 'services' => $hotel->services,
                 'amenities' => $hotel->amenities_list,
+                'gallery' => $hotel->gallery,
 
                 'active' => $hotel->active,
             ];

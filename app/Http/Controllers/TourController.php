@@ -76,6 +76,7 @@ class TourController extends Controller
                 'images' => $tour->images,
                 'services' => $tour->services,
                 'amenities' => $tour->amenities_list,
+                'gallery' => $tour->gallery,
 
                 'active' => $tour->active,
             ];

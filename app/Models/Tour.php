@@ -59,4 +59,25 @@ class Tour extends Model
             }
         );
     }
+
+    protected function amenitiesList(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                // 1. Si services es null o está vacío, devolvemos array vacío
+                if (empty($this->services)) {
+                    return [];
+                }
+
+                // 2. Extraemos los IDs del JSON (igual que en tu controller)
+                $ids = collect($this->services)->pluck('id')->filter();
+
+                // 3. Hacemos la consulta (cacheable si quisieras optimizar más)
+                return ServiciosSubcategoria::whereIn('id', $ids)
+                    ->pluck('name')
+                    ->values()
+                    ->toArray();
+            }
+        );
+    }
 }

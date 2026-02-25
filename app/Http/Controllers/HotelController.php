@@ -23,7 +23,7 @@ class HotelController extends Controller
                     'slug' => $hotel->slug,
                     'images' => $hotel->images,
                     'active' => $hotel->active,
-                    'principal' => $hotel->principal_image_url, //Aqui va cargar la imagen principal
+                    'principal' => $hotel->principal_image_url,
                 ];
             });
 

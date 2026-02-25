@@ -59,8 +59,28 @@ class TourController extends Controller
     public function show(string $id)
     {
         try {
-            $tour = Tour::findOrFail($id);
-            return response()->json($tour);
+            $tour = Tour::with('destino')->findOrFail($id);
+
+            $data = [
+                'id' => $tour->id,
+                'name' => $tour->name,
+                'slug' => $tour->slug,
+                'destino_id' => $tour->destino_id,
+                'destino' => $tour->destino?->name,
+
+                'address' => $tour->address,
+                'description' => $tour->description,
+                'price' => $tour->price,
+                'reviews' => $tour->reviews,
+                'google_maps' => $tour->google_maps,
+                'images' => $tour->images,
+                'services' => $tour->services,
+                'amenities' => $tour->amenities_list,
+
+                'active' => $tour->active,
+            ];
+
+            return response()->json($data);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'El tour seleccionado no existe'

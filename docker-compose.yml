@@ -1,0 +1,20 @@
+services:
+    api:
+        build:
+            context: .
+            dockerfile: Dockerfile # Asegúrate de tener el Dockerfile en esta carpeta
+        container_name: api_web
+        restart: unless-stopped
+        ports:
+            - "8050:80"     # Puerto diferente al del primer proyecto
+            - "5180:5173"   # Puerto de Vite diferente
+        volumes:
+            - ./:/var/www/html
+            - /var/www/html/vendor
+            - /var/www/html/node_modules
+        networks:
+            - tdmx # Se conecta a la red del primer proyecto
+
+networks:
+    tdmx:
+        external: true # IMPORTANTE: Le decimos que esta red ya existe afuera

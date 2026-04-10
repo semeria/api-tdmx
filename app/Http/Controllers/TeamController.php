@@ -7,6 +7,9 @@ use App\Models\Team;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 class TeamController extends Controller
 {
     /**
@@ -183,5 +186,42 @@ class TeamController extends Controller
     {
         Team::destroy($id);
         return response()->json('El miembro ha sido eliminado.');
+    }
+
+    public function reorder(Request $request)
+    {
+        // Validamos que 'ranks' sea un array y tenga el formato correcto
+        $request->validate([
+            'ranks' => 'required|array',
+            'ranks.*.id' => 'required|exists:teams,id',
+            'ranks.*.order' => 'required|integer',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($request->ranks as $rank) {
+                Team::where('id', $rank['id'])->update([
+                    'order' => $rank['order']
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Orden actualizado correctamente',
+                'status' => 'success'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::error("Error reordenando equipo: " . $e->getMessage());
+
+            return response()->json([
+                'message' => 'Error al procesar el reordenamiento',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

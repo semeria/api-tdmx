@@ -23,4 +23,5 @@ Route::apiResource('categoria', ServicioCategoriaController::class);
 Route::apiResource('subcategoria', ServicioSubcategoriaController::class);
 Route::apiResource('team', TeamController::class);
 
+Route::post('/team/reorder', [TeamController::class, 'reorder']);
 Route::post('/register', [UserController::class, 'register']);

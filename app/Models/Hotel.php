@@ -39,10 +39,6 @@ class Hotel extends Model
         });
     }
 
-    public function teams()
-    {
-        return $this->belongsToMany(Team::class, 'hotel_team');
-    }
 
     protected function amenitiesList(): Attribute
     {

@@ -37,11 +37,6 @@ class Tour extends Model
         });
     }
 
-    public function teams()
-    {
-        return $this->belongsToMany(Team::class, 'tour_team');
-    }
-
     protected function principalImageUrl(): Attribute
     {
         return Attribute::make(

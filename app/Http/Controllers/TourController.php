@@ -129,7 +129,6 @@ class TourController extends Controller
 
     public function getTourBySlug(string $slug) {
         $tour = Tour::where('slug', $slug)
-            ->with('teams')
             ->firstOrFail();
         return response()->json($tour);
     }
